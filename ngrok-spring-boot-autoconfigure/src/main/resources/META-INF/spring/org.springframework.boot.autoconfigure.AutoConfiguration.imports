@@ -1,0 +1,2 @@
+com.kermel.ngrok.autoconfigure.NgrokAutoConfiguration
+com.kermel.ngrok.actuator.NgrokEndpointAutoConfiguration
