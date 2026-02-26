@@ -165,6 +165,7 @@ public class TrafficPolicyGenerator {
 
     private PolicyAction invokeMethod(Object bean, Method method) {
         try {
+            method.setAccessible(true);
             Object result = method.invoke(bean);
             if (result instanceof PolicyAction action) {
                 return action;
