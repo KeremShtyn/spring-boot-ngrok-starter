@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.boot.web.server.WebServer;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.List;
@@ -123,10 +124,10 @@ class NgrokMultiTunnelTest {
 
             lifecycle.onApplicationEvent(webServerEvent);
 
-            ArgumentCaptor<Object> captor = ArgumentCaptor.forClass(Object.class);
+            ArgumentCaptor<ApplicationEvent> captor = ArgumentCaptor.forClass(ApplicationEvent.class);
             verify(eventPublisher, times(3)).publishEvent(captor.capture());
 
-            List<Object> events = captor.getAllValues();
+            List<ApplicationEvent> events = captor.getAllValues();
             long establishedCount = events.stream()
                     .filter(e -> e instanceof NgrokTunnelEstablishedEvent)
                     .count();

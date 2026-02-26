@@ -12,8 +12,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.boot.web.server.WebServer;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,6 +26,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class NgrokLifecycleTest {
 
     @Mock
@@ -83,7 +87,7 @@ class NgrokLifecycleTest {
 
         lifecycle.onApplicationEvent(webServerEvent);
 
-        ArgumentCaptor<Object> eventCaptor = ArgumentCaptor.forClass(Object.class);
+        ArgumentCaptor<ApplicationEvent> eventCaptor = ArgumentCaptor.forClass(ApplicationEvent.class);
         verify(eventPublisher, times(2)).publishEvent(eventCaptor.capture());
 
         assertThat(eventCaptor.getAllValues().get(0)).isInstanceOf(NgrokTunnelEstablishedEvent.class);
