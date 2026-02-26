@@ -76,17 +76,17 @@ public class TrafficPolicyBuilder {
         }
 
         /** Return to the parent builder to start a new phase. */
-        public TrafficPolicyBuilder onHttpRequest() {
+        public PhaseBuilder onHttpRequest() {
             return parent.onHttpRequest();
         }
 
         /** Return to the parent builder to start a new phase. */
-        public TrafficPolicyBuilder onHttpResponse() {
+        public PhaseBuilder onHttpResponse() {
             return parent.onHttpResponse();
         }
 
         /** Return to the parent builder to start a new phase. */
-        public TrafficPolicyBuilder onTcpConnect() {
+        public PhaseBuilder onTcpConnect() {
             return parent.onTcpConnect();
         }
 
