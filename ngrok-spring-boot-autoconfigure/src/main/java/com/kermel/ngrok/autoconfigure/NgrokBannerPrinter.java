@@ -1,5 +1,6 @@
 package com.kermel.ngrok.autoconfigure;
 
+import com.kermel.ngrok.core.NgrokStarterVersion;
 import com.kermel.ngrok.core.NgrokTunnel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +56,7 @@ public class NgrokBannerPrinter {
 
         sb.append("+-").append(border).append("-+\n");
         sb.append("| ").append(empty).append(" |\n");
-        sb.append("| ").append(padRight("  ngrok tunnel established", contentWidth)).append(" |\n");
+        sb.append("| ").append(padRight("  ngrok tunnel established (v" + NgrokStarterVersion.getVersion() + ")", contentWidth)).append(" |\n");
         sb.append("| ").append(empty).append(" |\n");
         sb.append("| ").append(padRight("  Public URL:  " + url, contentWidth)).append(" |\n");
         sb.append("| ").append(padRight("  Forwarding:  " + forwarding, contentWidth)).append(" |\n");
@@ -81,7 +82,7 @@ public class NgrokBannerPrinter {
         String empty = " ".repeat(contentWidth);
 
         sb.append("+-").append(border).append("-+\n");
-        sb.append("| ").append(padRight("  ngrok tunnels established", contentWidth)).append(" |\n");
+        sb.append("| ").append(padRight("  ngrok tunnels established (v" + NgrokStarterVersion.getVersion() + ")", contentWidth)).append(" |\n");
         sb.append("| ").append(empty).append(" |\n");
 
         for (NgrokTunnel tunnel : tunnels) {
