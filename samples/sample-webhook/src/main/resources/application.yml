@@ -1,0 +1,55 @@
+spring:
+  profiles:
+    active: dev
+
+server:
+  port: 8082
+
+ngrok:
+  enabled: true
+
+  webhooks:
+    # Stripe webhook — registers automatically with Stripe API
+    stripe:
+      enabled: true
+      api-key: ${STRIPE_API_KEY:}
+      events:
+        - payment_intent.succeeded
+        - checkout.session.completed
+        - invoice.paid
+      path: /webhooks/stripe
+      auto-deregister: true
+
+    # GitHub webhook — registers with a specific repo
+    github:
+      enabled: true
+      token: ${GITHUB_TOKEN:}
+      owner: kermel
+      repo: my-app
+      events:
+        - push
+        - pull_request
+      path: /webhooks/github
+      content-type: json
+      auto-deregister: true
+
+    # Slack — log-only mode (copy URL to Slack dashboard manually)
+    slack:
+      enabled: true
+      path: /webhooks/slack
+
+    # Custom webhook — generic HTTP registration
+    custom:
+      - name: order-service
+        registration-url: https://api.example.com/webhooks
+        method: POST
+        headers:
+          Authorization: "Bearer ${ORDER_SERVICE_TOKEN:demo-token}"
+        body-template: |
+          {
+            "url": "{{ngrok.public-url}}/callbacks/orders",
+            "events": ["order.created", "order.updated"]
+          }
+        deregistration-url: https://api.example.com/webhooks/{{webhook.id}}
+        deregistration-method: DELETE
+        auto-deregister: true

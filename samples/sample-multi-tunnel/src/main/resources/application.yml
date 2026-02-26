@@ -1,0 +1,43 @@
+spring:
+  profiles:
+    active: dev
+
+server:
+  port: 8080
+
+ngrok:
+  enabled: true
+
+  # Named tunnels — when this map is non-empty, the default tunnel is NOT created.
+  # Each entry creates an independent ngrok tunnel.
+  tunnels:
+
+    # Public-facing API tunnel (HTTP)
+    api:
+      port: 8080
+      protocol: http
+      metadata: "Public API endpoint"
+
+    # Admin dashboard tunnel with basic auth protection (HTTP)
+    admin:
+      port: 8080
+      protocol: http
+      basic-auth: "admin:secret123"
+      metadata: "Admin panel — protected"
+
+    # Database tunnel for remote access (TCP)
+    database:
+      port: 5432
+      protocol: tcp
+      fail-open: true
+      metadata: "PostgreSQL remote access"
+
+  # Reconnection settings for all tunnels
+  reconnection:
+    enabled: true
+    check-interval-seconds: 30
+    max-attempts: 5
+
+  # Banner displays all tunnels in a table
+  banner:
+    enabled: true

@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: sample-inspector
+  profiles:
+    active: dev
+
+server:
+  port: 8082
+
+ngrok:
+  enabled: true
+  profile-restricted: true
+  active-profiles:
+    - dev
+
+  # Inspection is enabled by default; customize the port if needed
+  inspection:
+    enabled: true
+    port: 4040
+
+  default-tunnel:
+    port: ${server.port}
+
+# Expose actuator endpoints including ngrokrequests
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,ngrok,ngrokrequests

@@ -1,0 +1,15 @@
+spring:
+  profiles:
+    active: dev
+
+server:
+  port: 8080
+
+ngrok:
+  enabled: true
+  profile-restricted: true
+  active-profiles:
+    - dev
+    - local
+  banner:
+    enabled: true
