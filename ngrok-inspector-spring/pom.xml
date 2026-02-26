@@ -32,6 +32,10 @@
             <artifactId>spring-web</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
 
         <!-- Jackson for JSON deserialization of ngrok API responses -->
         <dependency>
