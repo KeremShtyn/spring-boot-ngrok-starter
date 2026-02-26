@@ -2,6 +2,7 @@ package com.kermel.ngrok.actuator;
 
 import com.kermel.ngrok.autoconfigure.NgrokProperties;
 import com.kermel.ngrok.autoconfigure.NgrokTunnelReconnector;
+import com.kermel.ngrok.core.NgrokStarterVersion;
 import com.kermel.ngrok.core.NgrokTunnel;
 import com.kermel.ngrok.core.NgrokTunnelRegistry;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
@@ -45,6 +46,7 @@ public class NgrokEndpoint {
         }
 
         info.put("status", "running");
+        info.put("version", NgrokStarterVersion.getVersion());
         info.put("uptime", formatDuration(Duration.between(startedAt, Instant.now())));
         info.put("inspectionUrl", "http://localhost:" + properties.getInspection().getPort());
 

@@ -40,6 +40,7 @@ public class NgrokHealthIndicator extends AbstractHealthIndicator {
         }
 
         builder.up();
+        builder.withDetail("version", NgrokStarterVersion.getVersion());
         builder.withDetail("tunnelCount", tunnelRegistry.size());
         builder.withDetail("uptime", formatDuration(Duration.between(startedAt, Instant.now())));
 
