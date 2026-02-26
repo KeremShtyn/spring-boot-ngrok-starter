@@ -134,7 +134,8 @@ public class NgrokTunnelManager {
 
         String policy = resolveTrafficPolicy(name, config);
         if (policy != null) {
-            builder.withTrafficPolicy(policy);
+            log.debug("Traffic policy configured for tunnel '{}' — " +
+                    "will be applied via ngrok-traffic-policy-spring module", name);
         }
 
         if (config.getBasicAuth() != null) {
