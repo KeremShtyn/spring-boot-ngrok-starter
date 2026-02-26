@@ -2,6 +2,7 @@ package com.kermel.ngrok.autoconfigure;
 
 import com.github.alexdlaird.ngrok.NgrokClient;
 import com.github.alexdlaird.ngrok.conf.JavaNgrokConfig;
+import com.github.alexdlaird.ngrok.protocol.Region;
 import com.kermel.ngrok.core.NgrokHealthIndicator;
 import com.kermel.ngrok.core.NgrokPublicUrlProvider;
 import com.kermel.ngrok.core.NgrokTunnelRegistry;
@@ -46,7 +47,7 @@ public class NgrokAutoConfiguration {
         }
 
         if (properties.getRegion() != null) {
-            configBuilder.withRegion(properties.getRegion());
+            configBuilder.withRegion(Region.valueOf(properties.getRegion().toUpperCase()));
         }
 
         if (properties.getBinaryPath() != null) {
