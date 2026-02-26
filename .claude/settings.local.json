@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell.exe -Command \"Get-ChildItem ''C:\\\\Program Files\\\\Java'' -ErrorAction SilentlyContinue | Select-Object Name; Get-ChildItem ''C:\\\\Program Files\\\\Eclipse Adoptium'' -ErrorAction SilentlyContinue | Select-Object Name; Get-Command java -ErrorAction SilentlyContinue | Select-Object Source; Get-Command mvn -ErrorAction SilentlyContinue | Select-Object Source\")",
+      "Bash(powershell.exe -NoProfile -Command \"[Environment]::GetEnvironmentVariable\\(''JAVA_HOME'', ''Machine''\\); [Environment]::GetEnvironmentVariable\\(''MAVEN_HOME'', ''Machine''\\); [Environment]::GetEnvironmentVariable\\(''Path'', ''Machine''\\)\")",
+      "Bash(mvn dependency:tree -pl ngrok-inspector-spring)",
+      "Bash(mvn clean compile -DskipTests -pl ngrok-webhook-spring)",
+      "Bash(grep -h \"^import \" src/main/java/com/kermel/ngrok/inspector/*.java src/main/java/com/kermel/ngrok/inspector/actuator/*.java)",
+      "Bash(grep -h \"^import \" src/test/java/com/kermel/ngrok/inspector/*.java src/test/java/com/kermel/ngrok/inspector/actuator/*.java)",
+      "Bash(mvn clean compile -DskipTests)",
+      "Bash(find src -type f -name \"*.java\" -exec grep -l \"toList\\(\\)\" {} ;)",
+      "Bash(grep -n \"forEach\" \"C:\\\\Users\\\\Kerem\\\\Documents\\\\GitHub\\\\spring-boot-ngrok-starter\\\\ngrok-webhook-spring\\\\src\\\\main\\\\java\\\\com\\\\kermel\\\\ngrok\\\\webhook\\\\provider\"/*.java)",
+      "Bash(grep -n \"\\\\.method\\(\" \"C:\\\\Users\\\\Kerem\\\\Documents\\\\GitHub\\\\spring-boot-ngrok-starter\\\\ngrok-webhook-spring\\\\src\\\\main\\\\java\\\\com\\\\kermel\\\\ngrok\\\\webhook\\\\provider\"/*.java)",
+      "Bash(find \"C:\\\\Users\\\\Kerem\\\\Documents\\\\GitHub\\\\spring-boot-ngrok-starter\\\\ngrok-traffic-policy-spring\\\\src\" -name \"*.java\" -type f -exec grep -l \"\\\\.and\\(\\)\" {} ;)",
+      "Bash(xargs grep -l \"class NgrokTunnel\\\\|record NgrokTunnel\\\\|class NgrokTunnelRegistry\\\\|class NgrokReadyEvent\")",
+      "Bash(grep -n \"retrieve\\(\\)\" /c/Users/Kerem/Documents/GitHub/spring-boot-ngrok-starter/ngrok-webhook-spring/src/main/java/com/kermel/ngrok/webhook/provider/*.java)",
+      "Bash(mvn -pl ngrok-webhook-spring test -Dtest=CustomWebhookProviderTest::registerInterpolatesTemplate)",
+      "Bash(xargs ls -la)",
+      "Bash(grep -E \"profile-restricted|active-profiles|traffic-policy|allow-cidrs|deny-cidrs\" /c/Users/Kerem/Documents/GitHub/spring-boot-ngrok-starter/samples/sample-*/src/main/resources/application.yml)",
+      "Bash(ls -d /c/Users/Kerem/Documents/GitHub/spring-boot-ngrok-starter/*/pom.xml)",
+      "Bash(xargs -I {} dirname {})",
+      "Bash(xargs basename -a)",
+      "Bash(xargs -I {} basename {})",
+      "Bash(grep -l \"@Configuration\" /c/Users/Kerem/Documents/GitHub/spring-boot-ngrok-starter/ngrok-spring-boot-autoconfigure/src/main/java/com/kermel/ngrok/autoconfigure/*.java)",
+      "Bash(git add pom.xml .gitignore ngrok-spring-boot-autoconfigure/ ngrok-spring-boot-starter/)",
+      "Bash(git commit:*)",
+      "Bash(git add ngrok-traffic-policy-spring/)",
+      "Bash(git add ngrok-webhook-spring/)",
+      "Bash(git add ngrok-inspector-spring/)",
+      "Bash(git add samples/)",
+      "Bash(git add docs/ README.md LICENSE CONTRIBUTING.md .github/ .claude/)"
+    ]
+  }
+}
