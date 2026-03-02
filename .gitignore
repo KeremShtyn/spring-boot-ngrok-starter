@@ -21,18 +21,43 @@ pom.xml.versionsBackup
 pom.xml.next
 release.properties
 
-# IDE
+# IDE - IntelliJ IDEA
 .idea/
 *.iml
 *.iws
 *.ipr
+out/
+
+# IDE - Eclipse
 .project
 .classpath
 .settings/
+bin/
+
+# IDE - VS Code
 .vscode/
+
+# IDE - NetBeans
+nb-configuration.xml
+nbproject/
+nbbuild/
+nbdist/
+
+# IDE - Vim/Neovim
 *.swp
 *.swo
 *~
+
+# IDE - Emacs
+\#*\#
+.\#*
+
+# IDE - Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# IDE - Fleet
+.fleet/
 
 # Claude Code
 .claude/
