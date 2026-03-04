@@ -5,6 +5,7 @@ import org.springframework.context.ApplicationEvent;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Published once when all ngrok tunnels have been established.
@@ -17,7 +18,7 @@ public class NgrokReadyEvent extends ApplicationEvent {
 
     public NgrokReadyEvent(Object source, Collection<NgrokTunnel> tunnels) {
         super(source);
-        this.tunnels = Collections.unmodifiableCollection(tunnels);
+        this.tunnels = List.copyOf(tunnels);
     }
 
     public Collection<NgrokTunnel> getTunnels() {

@@ -118,7 +118,12 @@ public class TrafficPolicyGenerator {
     }
 
     private void collectRules(Object bean, List<PolicyRule> rules) {
-        for (Method method : bean.getClass().getMethods()) {
+        Class<?> targetClass = bean.getClass();
+        // If the bean is a CGLIB proxy, inspect the superclass to find user-declared methods
+        if (targetClass.getName().contains("$$")) {
+            targetClass = targetClass.getSuperclass();
+        }
+        for (Method method : targetClass.getDeclaredMethods()) {
             if (method.isAnnotationPresent(OnHttpRequest.class)) {
                 OnHttpRequest ann = method.getAnnotation(OnHttpRequest.class);
                 PolicyAction action = invokeMethod(bean, method);

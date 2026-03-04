@@ -47,7 +47,12 @@ public class NgrokAutoConfiguration {
         }
 
         if (properties.getRegion() != null) {
-            configBuilder.withRegion(Region.valueOf(properties.getRegion().toUpperCase()));
+            try {
+                configBuilder.withRegion(Region.valueOf(properties.getRegion().toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                log.warn("Invalid ngrok region '{}'. Valid regions: us, eu, ap, au, sa, jp, in. " +
+                        "Falling back to default region.", properties.getRegion());
+            }
         }
 
         if (properties.getBinaryPath() != null) {

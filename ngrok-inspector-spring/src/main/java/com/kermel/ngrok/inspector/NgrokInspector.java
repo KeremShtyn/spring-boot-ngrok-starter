@@ -1,8 +1,13 @@
 package com.kermel.ngrok.inspector;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * High-level API for inspecting HTTP requests captured by ngrok.
@@ -28,6 +33,7 @@ import java.util.regex.Pattern;
  */
 public class NgrokInspector {
 
+    private static final Logger log = LoggerFactory.getLogger(NgrokInspector.class);
     private static final int DEFAULT_LIMIT = 50;
 
     private final InspectorClient client;
@@ -104,7 +110,13 @@ public class NgrokInspector {
      * @return list of matching captured requests
      */
     public List<CapturedRequest> getRequestsByPath(String pathPattern, int limit) {
-        Pattern pattern = Pattern.compile(pathPattern);
+        Pattern pattern;
+        try {
+            pattern = Pattern.compile(pathPattern);
+        } catch (PatternSyntaxException e) {
+            log.warn("Invalid regex pattern '{}': {}", pathPattern, e.getMessage());
+            return Collections.emptyList();
+        }
         return client.listRequests(limit).stream()
                 .filter(req -> pattern.matcher(req.path()).matches())
                 .toList();

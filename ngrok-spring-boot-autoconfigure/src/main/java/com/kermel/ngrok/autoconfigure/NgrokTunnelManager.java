@@ -118,17 +118,24 @@ public class NgrokTunnelManager {
     }
 
     private NgrokTunnel doCreateTunnel(String name, NgrokProperties.TunnelProperties config) {
+        if (config.getPort() == null) {
+            throw new NgrokTunnelException(
+                    "Port must be specified for tunnel '" + name + "'. " +
+                    "Set ngrok.default-tunnel.port or ngrok.tunnels.<name>.port in your configuration.");
+        }
+
         CreateTunnel.Builder builder = new CreateTunnel.Builder()
                 .withName(name)
                 .withAddr(config.getPort());
 
-        switch (config.getProtocol()) {
+        String protocol = config.getProtocol() != null ? config.getProtocol() : "http";
+        switch (protocol) {
             case "tcp" -> builder.withProto(Proto.TCP);
             case "tls" -> builder.withProto(Proto.TLS);
             default -> builder.withBindTls(config.isHttpsOnly());
         }
 
-        if (config.getDomain() != null) {
+        if (config.getDomain() != null && !config.getDomain().isBlank()) {
             builder.withDomain(config.getDomain());
         }
 
@@ -138,12 +145,12 @@ public class NgrokTunnelManager {
                     "will be applied via ngrok-traffic-policy-spring module", name);
         }
 
-        if (config.getBasicAuth() != null) {
+        if (config.getBasicAuth() != null && !config.getBasicAuth().isBlank()) {
             builder.withAuth(config.getBasicAuth());
         }
 
         log.debug("Creating ngrok tunnel '{}' on port {} with protocol {}",
-                name, config.getPort(), config.getProtocol());
+                name, config.getPort(), protocol);
 
         Tunnel tunnel = ngrokClient.connect(builder.build());
 
@@ -154,7 +161,7 @@ public class NgrokTunnelManager {
                 name,
                 tunnel.getPublicUrl(),
                 config.getPort(),
-                config.getProtocol(),
+                protocol,
                 Instant.now(),
                 config.getDomain(),
                 policy != null

@@ -27,6 +27,9 @@ public class InspectorClient {
 
     private static final Logger log = LoggerFactory.getLogger(InspectorClient.class);
 
+    private static final int REPLAY_POLL_ATTEMPTS = 10;
+    private static final long REPLAY_POLL_DELAY_MS = 200;
+
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
@@ -84,6 +87,10 @@ public class InspectorClient {
      */
     public Optional<CapturedResponse> replayRequest(String requestId, String tunnelName) {
         try {
+            // Capture the most recent request ID before replay so we can detect the new one
+            List<CapturedRequest> before = listRequests(1);
+            String lastIdBeforeReplay = before.isEmpty() ? null : before.get(0).id();
+
             Map<String, String> body = new LinkedHashMap<>();
             body.put("id", requestId);
             if (tunnelName != null && !tunnelName.isEmpty()) {
@@ -96,19 +103,31 @@ public class InspectorClient {
                     .retrieve()
                     .toBodilessEntity();
 
-            // After replay, fetch the latest request to get the response
-            // ngrok creates a new captured request for the replayed request
-            List<CapturedRequest> recent = listRequests(1);
-            if (!recent.isEmpty()) {
-                CapturedRequest replayed = recent.get(0);
-                return Optional.of(new CapturedResponse(
-                        replayed.responseStatusCode(),
-                        replayed.responseHeaders(),
-                        replayed.responseBody(),
-                        replayed.durationMs()
-                ));
+            // Poll until a new captured request appears that wasn't there before the replay
+            for (int i = 0; i < REPLAY_POLL_ATTEMPTS; i++) {
+                try {
+                    Thread.sleep(REPLAY_POLL_DELAY_MS);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return Optional.empty();
+                }
+
+                List<CapturedRequest> after = listRequests(1);
+                if (!after.isEmpty()) {
+                    CapturedRequest latest = after.get(0);
+                    // Only accept a request that appeared after we triggered the replay
+                    if (!Objects.equals(latest.id(), lastIdBeforeReplay)) {
+                        return Optional.of(new CapturedResponse(
+                                latest.responseStatusCode(),
+                                latest.responseHeaders(),
+                                latest.responseBody(),
+                                latest.durationMs()
+                        ));
+                    }
+                }
             }
 
+            log.warn("Timed out waiting for replayed request '{}' to appear in captured requests", requestId);
             return Optional.empty();
         } catch (RestClientException e) {
             log.warn("Failed to replay request '{}': {}", requestId, e.getMessage());

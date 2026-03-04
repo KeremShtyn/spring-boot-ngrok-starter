@@ -39,7 +39,7 @@ public class NgrokBannerPrinter {
             printMultipleTunnels(sb, tunnels);
         }
 
-        log.info(sb.toString());
+        log.info("{}", sb.toString());
 
         if (properties.getBanner().isCopyToClipboard()) {
             copyToClipboard(tunnels.iterator().next().publicUrl());
@@ -105,7 +105,7 @@ public class NgrokBannerPrinter {
                     .getSystemClipboard()
                     .setContents(new StringSelection(text), null);
             log.debug("Public URL copied to clipboard: {}", text);
-        } catch (Exception e) {
+        } catch (Exception | AWTError e) {
             log.debug("Could not copy to clipboard: {}", e.getMessage());
         }
     }
