@@ -15,6 +15,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.SmartLifecycle;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Manages the ngrok tunnel lifecycle within the Spring application.
@@ -34,8 +35,8 @@ public class NgrokLifecycle implements SmartLifecycle, ApplicationListener<WebSe
     private final ApplicationEventPublisher eventPublisher;
     private final NgrokTunnelReconnector reconnector;
 
-    private volatile boolean running = false;
-    private int serverPort = -1;
+    private final AtomicBoolean running = new AtomicBoolean(false);
+    private volatile int serverPort = -1;
 
     public NgrokLifecycle(NgrokTunnelManager tunnelManager,
                           NgrokTunnelRegistry tunnelRegistry,
@@ -60,11 +61,9 @@ public class NgrokLifecycle implements SmartLifecycle, ApplicationListener<WebSe
 
     @Override
     public void start() {
-        if (running || serverPort < 0) {
+        if (serverPort < 0 || !running.compareAndSet(false, true)) {
             return;
         }
-
-        running = true;
 
         try {
             Map<String, NgrokProperties.TunnelProperties> tunnelConfigs = properties.getTunnels();
@@ -79,24 +78,25 @@ public class NgrokLifecycle implements SmartLifecycle, ApplicationListener<WebSe
                 // Print banner
                 bannerPrinter.print(tunnelRegistry.getAllTunnels());
 
-                // Start reconnector
-                reconnector.start();
-
-                // Publish the NgrokReadyEvent
+                // Publish the NgrokReadyEvent before starting reconnector to avoid
+                // race where health-check fires before listeners receive the ready event
                 eventPublisher.publishEvent(new NgrokReadyEvent(this, tunnelRegistry.getAllTunnels()));
+
+                // Start reconnector after event publication
+                reconnector.start();
             } else {
                 log.warn("No ngrok tunnels were created successfully");
             }
-        } catch (NgrokStartupException e) {
-            // Non-recoverable startup errors (binary missing, port conflict)
-            running = false;
+        } catch (Exception e) {
+            // Reset running flag so start() can be retried after any failure
+            running.set(false);
             throw e;
         }
     }
 
     @Override
     public void stop() {
-        if (!running) {
+        if (!running.compareAndSet(true, false)) {
             return;
         }
 
@@ -116,12 +116,11 @@ public class NgrokLifecycle implements SmartLifecycle, ApplicationListener<WebSe
 
         tunnelRegistry.clear();
         tunnelManager.shutdown();
-        running = false;
     }
 
     @Override
     public boolean isRunning() {
-        return running;
+        return running.get();
     }
 
     @Override

@@ -41,8 +41,8 @@ public class NgrokTunnelReconnector {
     /** Stores the original config for each tunnel name so we can recreate them. */
     private final Map<String, NgrokProperties.TunnelProperties> tunnelConfigs;
 
-    private ScheduledExecutorService scheduler;
-    private ScheduledFuture<?> checkTask;
+    private volatile ScheduledExecutorService scheduler;
+    private volatile ScheduledFuture<?> checkTask;
 
     private final AtomicInteger totalReconnections = new AtomicInteger(0);
     private final AtomicInteger failedReconnections = new AtomicInteger(0);
@@ -104,6 +104,13 @@ public class NgrokTunnelReconnector {
         }
         if (scheduler != null) {
             scheduler.shutdownNow();
+            try {
+                if (!scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
+                    log.warn("Reconnector scheduler did not terminate within 5 seconds");
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
         tunnelConfigs.clear();
         log.debug("Tunnel reconnector stopped");
@@ -142,7 +149,7 @@ public class NgrokTunnelReconnector {
                 }
             }
         } catch (Exception e) {
-            log.debug("Error during tunnel health check: {}", e.getMessage());
+            log.warn("Error during tunnel health check (ngrok API may be unreachable): {}", e.getMessage());
         }
     }
 

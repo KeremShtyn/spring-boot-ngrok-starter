@@ -1,7 +1,7 @@
 package com.kermel.ngrok.core;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -56,10 +56,13 @@ public class NgrokTunnelRegistry {
     }
 
     /**
-     * Get all active tunnels.
+     * Get all active tunnels as a snapshot.
+     *
+     * <p>Returns a new list each time; modifications to the registry
+     * after this call are not reflected in the returned collection.
      */
     public Collection<NgrokTunnel> getAllTunnels() {
-        return Collections.unmodifiableCollection(tunnels.values());
+        return List.copyOf(tunnels.values());
     }
 
     /**
