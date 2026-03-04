@@ -15,7 +15,7 @@ public class CustomResponseAction extends PolicyAction {
     private CustomResponseAction(Builder builder) {
         this.statusCode = builder.statusCode;
         this.content = builder.content;
-        this.headers = builder.headers;
+        this.headers = Map.copyOf(builder.headers);
     }
 
     @Override

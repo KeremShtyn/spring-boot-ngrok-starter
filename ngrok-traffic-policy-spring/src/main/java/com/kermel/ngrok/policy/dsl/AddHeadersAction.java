@@ -11,7 +11,7 @@ public class AddHeadersAction extends PolicyAction {
     private final Map<String, String> headers;
 
     private AddHeadersAction(Builder builder) {
-        this.headers = builder.headers;
+        this.headers = Map.copyOf(builder.headers);
     }
 
     @Override

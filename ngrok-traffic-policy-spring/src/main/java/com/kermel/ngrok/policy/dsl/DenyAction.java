@@ -12,6 +12,10 @@ public class DenyAction extends PolicyAction {
     private final String message;
 
     public DenyAction(int statusCode, String message) {
+        if (statusCode < 400 || statusCode > 599) {
+            throw new IllegalArgumentException(
+                    "Deny status code must be in the 4xx-5xx range, got: " + statusCode);
+        }
         this.statusCode = statusCode;
         this.message = message;
     }

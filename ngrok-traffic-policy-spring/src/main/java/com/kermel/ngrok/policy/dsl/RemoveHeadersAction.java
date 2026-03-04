@@ -13,7 +13,7 @@ public class RemoveHeadersAction extends PolicyAction {
     private final List<String> headers;
 
     private RemoveHeadersAction(Builder builder) {
-        this.headers = builder.headers;
+        this.headers = List.copyOf(builder.headers);
     }
 
     @Override

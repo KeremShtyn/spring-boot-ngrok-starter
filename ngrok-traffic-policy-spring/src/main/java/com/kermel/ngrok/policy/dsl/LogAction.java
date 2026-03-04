@@ -11,7 +11,7 @@ public class LogAction extends PolicyAction {
     private final Map<String, Object> metadata;
 
     private LogAction(Builder builder) {
-        this.metadata = builder.metadata;
+        this.metadata = Map.copyOf(builder.metadata);
     }
 
     @Override

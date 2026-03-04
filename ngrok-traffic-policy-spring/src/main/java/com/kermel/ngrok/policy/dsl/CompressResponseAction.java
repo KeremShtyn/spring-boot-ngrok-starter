@@ -13,7 +13,7 @@ public class CompressResponseAction extends PolicyAction {
     private final List<String> algorithms;
 
     private CompressResponseAction(Builder builder) {
-        this.algorithms = builder.algorithms;
+        this.algorithms = List.copyOf(builder.algorithms);
     }
 
     @Override

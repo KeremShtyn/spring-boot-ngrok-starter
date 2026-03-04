@@ -19,7 +19,7 @@ public class RateLimitAction extends PolicyAction {
         this.algorithm = builder.algorithm;
         this.capacity = builder.capacity;
         this.rate = builder.rate;
-        this.bucketKeys = builder.bucketKeys;
+        this.bucketKeys = List.copyOf(builder.bucketKeys);
     }
 
     @Override

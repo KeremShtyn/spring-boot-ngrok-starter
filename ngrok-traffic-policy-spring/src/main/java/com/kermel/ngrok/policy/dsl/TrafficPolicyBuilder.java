@@ -131,7 +131,7 @@ public class TrafficPolicyBuilder {
          * Returns the phase builder for chaining.
          */
         public PhaseBuilder action(PolicyAction action) {
-            phaseBuilder.addRule(new PolicyRule(phase, name, expressions, action, order));
+            phaseBuilder.addRule(new PolicyRule(phase, name, List.copyOf(expressions), action, order));
             return phaseBuilder;
         }
     }

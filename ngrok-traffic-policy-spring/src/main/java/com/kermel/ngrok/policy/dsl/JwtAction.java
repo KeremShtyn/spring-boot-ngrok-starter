@@ -20,7 +20,7 @@ public class JwtAction extends PolicyAction {
         this.issuer = builder.issuer;
         this.audience = builder.audience;
         this.jwksUrl = builder.jwksUrl;
-        this.allowedAlgorithms = builder.allowedAlgorithms;
+        this.allowedAlgorithms = List.copyOf(builder.allowedAlgorithms);
         this.tokenLocation = builder.tokenLocation;
     }
 
@@ -49,7 +49,9 @@ public class JwtAction extends PolicyAction {
             issuerConfig.put("jws", jws);
         }
 
-        config.put("issuer", issuerConfig);
+        if (!issuerConfig.isEmpty()) {
+            config.put("issuer", issuerConfig);
+        }
 
         if (tokenLocation != null) {
             config.put("token", Map.of("location", tokenLocation));

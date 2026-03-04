@@ -44,6 +44,9 @@ public class UrlRewriteAction extends PolicyAction {
         }
 
         public UrlRewriteAction build() {
+            if (from == null || to == null) {
+                throw new IllegalStateException("Both 'from' and 'to' must be set for url-rewrite action");
+            }
             return new UrlRewriteAction(this);
         }
     }
