@@ -31,6 +31,10 @@ public class StripeWebhookProvider implements WebhookProvider {
 
     public StripeWebhookProvider(WebhookProperties.StripeWebhookConfig config) {
         this.config = config;
+        if (config.getApiKey() == null || config.getApiKey().isBlank()) {
+            throw new IllegalArgumentException(
+                    "Stripe API key must be configured. Set ngrok.webhooks.stripe.api-key in your application properties.");
+        }
         this.restClient = RestClient.builder()
                 .baseUrl(STRIPE_API_BASE)
                 .defaultHeader("Authorization", "Bearer " + config.getApiKey())

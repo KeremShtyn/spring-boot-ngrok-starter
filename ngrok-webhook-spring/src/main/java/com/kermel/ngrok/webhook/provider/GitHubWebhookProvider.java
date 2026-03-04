@@ -29,6 +29,10 @@ public class GitHubWebhookProvider implements WebhookProvider {
 
     public GitHubWebhookProvider(WebhookProperties.GitHubWebhookConfig config) {
         this.config = config;
+        if (config.getToken() == null || config.getToken().isBlank()) {
+            throw new IllegalArgumentException(
+                    "GitHub webhook token must be configured. Set ngrok.webhooks.github.token in your application properties.");
+        }
         this.restClient = RestClient.builder()
                 .baseUrl(GITHUB_API_BASE)
                 .defaultHeader("Authorization", "Bearer " + config.getToken())
@@ -87,7 +91,8 @@ public class GitHubWebhookProvider implements WebhookProvider {
                     .retrieve()
                     .body(Map.class);
 
-            String hookId = response != null ? String.valueOf(response.get("id")) : null;
+            String hookId = response != null && response.get("id") != null
+                    ? String.valueOf(response.get("id")) : null;
 
             log.info("GitHub webhook registered for {}/{}: {} (ID: {})",
                     config.getOwner(), config.getRepo(), webhookUrl, hookId);

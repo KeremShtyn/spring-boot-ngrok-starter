@@ -29,10 +29,17 @@ public class TwilioWebhookProvider implements WebhookProvider {
 
     private final WebhookProperties.TwilioWebhookConfig config;
     private final RestClient restClient;
-    private String phoneNumberSid;
 
     public TwilioWebhookProvider(WebhookProperties.TwilioWebhookConfig config) {
         this.config = config;
+        if (config.getAccountSid() == null || config.getAccountSid().isBlank()) {
+            throw new IllegalArgumentException(
+                    "Twilio account SID must be configured. Set ngrok.webhooks.twilio.account-sid in your application properties.");
+        }
+        if (config.getAuthToken() == null || config.getAuthToken().isBlank()) {
+            throw new IllegalArgumentException(
+                    "Twilio auth token must be configured. Set ngrok.webhooks.twilio.auth-token in your application properties.");
+        }
         String credentials = config.getAccountSid() + ":" + config.getAuthToken();
         String encoded = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
         this.restClient = RestClient.builder()
@@ -72,7 +79,7 @@ public class TwilioWebhookProvider implements WebhookProvider {
     public WebhookRegistrationResult register(String webhookUrl) {
         try {
             // Step 1: Find the PhoneNumberSid for the configured phone number
-            phoneNumberSid = lookupPhoneNumberSid();
+            String sid = lookupPhoneNumberSid();
 
             // Step 2: Update the SMS URL for this phone number
             MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
@@ -80,14 +87,14 @@ public class TwilioWebhookProvider implements WebhookProvider {
 
             restClient.post()
                     .uri("/2010-04-01/Accounts/{sid}/IncomingPhoneNumbers/{pnSid}.json",
-                            config.getAccountSid(), phoneNumberSid)
+                            config.getAccountSid(), sid)
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(formData)
                     .retrieve()
                     .body(Map.class);
 
             log.info("Twilio webhook registered for {}: {}", config.getPhoneNumber(), webhookUrl);
-            return WebhookRegistrationResult.success("twilio", phoneNumberSid, webhookUrl, config.isAutoDeregister());
+            return WebhookRegistrationResult.success("twilio", sid, webhookUrl, config.isAutoDeregister());
 
         } catch (Exception e) {
             log.error("Failed to register Twilio webhook for {}: {}", config.getPhoneNumber(), e.getMessage());
@@ -97,7 +104,8 @@ public class TwilioWebhookProvider implements WebhookProvider {
 
     @Override
     public void deregister(WebhookRegistrationResult registration) {
-        if (phoneNumberSid == null) {
+        String sid = registration.webhookId();
+        if (sid == null) {
             log.debug("No phone number SID to reset for Twilio");
             return;
         }
@@ -109,7 +117,7 @@ public class TwilioWebhookProvider implements WebhookProvider {
 
             restClient.post()
                     .uri("/2010-04-01/Accounts/{sid}/IncomingPhoneNumbers/{pnSid}.json",
-                            config.getAccountSid(), phoneNumberSid)
+                            config.getAccountSid(), sid)
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(formData)
                     .retrieve()
@@ -140,6 +148,11 @@ public class TwilioWebhookProvider implements WebhookProvider {
                     "Phone number " + config.getPhoneNumber() + " not found in Twilio account");
         }
 
-        return (String) phoneNumbers.get(0).get("sid");
+        String sid = (String) phoneNumbers.get(0).get("sid");
+        if (sid == null || sid.isBlank()) {
+            throw new WebhookRegistrationException(
+                    "Twilio returned a phone number entry without a valid SID for " + config.getPhoneNumber());
+        }
+        return sid;
     }
 }
