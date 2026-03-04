@@ -38,7 +38,10 @@ public class NgrokEndpoint {
     public Map<String, Object> ngrokInfo() {
         Map<String, Object> info = new LinkedHashMap<>();
 
-        if (tunnelRegistry.isEmpty()) {
+        // Snapshot the tunnels once to avoid TOCTOU race with the reconnector
+        List<NgrokTunnel> tunnels = List.copyOf(tunnelRegistry.getAllTunnels());
+
+        if (tunnels.isEmpty()) {
             info.put("status", "stopped");
             info.put("tunnels", List.of());
             info.put("reconnection", reconnectorInfo());
@@ -50,7 +53,7 @@ public class NgrokEndpoint {
         info.put("uptime", formatDuration(Duration.between(startedAt, Instant.now())));
         info.put("inspectionUrl", "http://localhost:" + properties.getInspection().getPort());
 
-        List<Map<String, Object>> tunnelList = tunnelRegistry.getAllTunnels().stream()
+        List<Map<String, Object>> tunnelList = tunnels.stream()
                 .map(this::tunnelToMap)
                 .toList();
 

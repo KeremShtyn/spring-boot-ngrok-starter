@@ -7,7 +7,9 @@ import org.springframework.boot.actuate.health.Health;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,7 +33,10 @@ public class NgrokHealthIndicator extends AbstractHealthIndicator {
 
     @Override
     protected void doHealthCheck(Health.Builder builder) {
-        if (tunnelRegistry.isEmpty()) {
+        // Snapshot the tunnels once to avoid TOCTOU race with the reconnector
+        List<NgrokTunnel> tunnels = List.copyOf(tunnelRegistry.getAllTunnels());
+
+        if (tunnels.isEmpty()) {
             builder.down()
                     .withDetail("status", "No active tunnels")
                     .withDetail("message", "ngrok has no active tunnels. " +
@@ -41,10 +46,10 @@ public class NgrokHealthIndicator extends AbstractHealthIndicator {
 
         builder.up();
         builder.withDetail("version", NgrokStarterVersion.getVersion());
-        builder.withDetail("tunnelCount", tunnelRegistry.size());
+        builder.withDetail("tunnelCount", tunnels.size());
         builder.withDetail("uptime", formatDuration(Duration.between(startedAt, Instant.now())));
 
-        for (NgrokTunnel tunnel : tunnelRegistry.getAllTunnels()) {
+        for (NgrokTunnel tunnel : tunnels) {
             Map<String, Object> tunnelInfo = new LinkedHashMap<>();
             tunnelInfo.put("publicUrl", tunnel.publicUrl());
             tunnelInfo.put("localPort", tunnel.localPort());

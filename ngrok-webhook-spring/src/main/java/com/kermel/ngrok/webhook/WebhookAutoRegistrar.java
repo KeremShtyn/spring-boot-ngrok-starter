@@ -54,7 +54,16 @@ public class WebhookAutoRegistrar {
                 continue;
             }
 
-            String webhookUrl = publicUrl + provider.path();
+            String path = provider.path();
+            String normalizedUrl = publicUrl.endsWith("/") ? publicUrl.substring(0, publicUrl.length() - 1) : publicUrl;
+            String webhookUrl;
+            if (path == null || path.isBlank()) {
+                // No path configured — use the base URL without appending a trailing slash
+                webhookUrl = normalizedUrl;
+            } else {
+                String normalizedPath = path.startsWith("/") ? path : "/" + path;
+                webhookUrl = normalizedUrl + normalizedPath;
+            }
 
             try {
                 WebhookRegistrationResult result = provider.register(webhookUrl);
@@ -65,7 +74,7 @@ public class WebhookAutoRegistrar {
                 } else {
                     log.warn("Webhook '{}' registration reported failure: {}", provider.name(), result.message());
                 }
-            } catch (WebhookRegistrationException e) {
+            } catch (Exception e) {
                 log.warn("Webhook '{}' registration failed: {}", provider.name(), e.getMessage());
                 registrations.add(WebhookRegistrationResult.failure(provider.name(), webhookUrl, e.getMessage()));
             }
@@ -74,19 +83,27 @@ public class WebhookAutoRegistrar {
 
     /**
      * Get all registration results (successful and failed).
+     *
+     * @return a snapshot copy of the current registrations
      */
     public List<WebhookRegistrationResult> getRegistrations() {
-        return Collections.unmodifiableList(registrations);
+        synchronized (registrations) {
+            return List.copyOf(registrations);
+        }
     }
 
     /**
      * Get only the successful registrations that have auto-deregister enabled.
+     *
+     * @return a snapshot copy of the matching registrations
      */
     public List<WebhookRegistrationResult> getAutoDeregisterRegistrations() {
-        return registrations.stream()
-                .filter(WebhookRegistrationResult::success)
-                .filter(WebhookRegistrationResult::autoDeregister)
-                .toList();
+        synchronized (registrations) {
+            return registrations.stream()
+                    .filter(WebhookRegistrationResult::success)
+                    .filter(WebhookRegistrationResult::autoDeregister)
+                    .toList();
+        }
     }
 
     private String resolvePublicUrl(WebhookProvider provider) {
