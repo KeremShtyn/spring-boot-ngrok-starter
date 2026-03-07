@@ -218,6 +218,11 @@ class InspectorClientTest {
             RestClient.Builder builder = RestClient.builder().baseUrl("http://localhost:4040");
             MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
 
+            // Initial GET to capture the most recent request ID before replay
+            server.expect(requestTo("http://localhost:4040/api/requests/http?limit=1"))
+                    .andExpect(method(HttpMethod.GET))
+                    .andRespond(withSuccess("{\"requests\": []}", MediaType.APPLICATION_JSON));
+
             // Replay POST
             server.expect(requestTo("http://localhost:4040/api/requests/http"))
                     .andExpect(method(HttpMethod.POST))
@@ -264,6 +269,12 @@ class InspectorClientTest {
             RestClient.Builder builder = RestClient.builder().baseUrl("http://localhost:4040");
             MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
 
+            // Initial GET to capture the most recent request ID before replay
+            server.expect(requestTo("http://localhost:4040/api/requests/http?limit=1"))
+                    .andExpect(method(HttpMethod.GET))
+                    .andRespond(withSuccess("{\"requests\": []}", MediaType.APPLICATION_JSON));
+
+            // Replay POST fails
             server.expect(requestTo("http://localhost:4040/api/requests/http"))
                     .andRespond(withServerError());
 
