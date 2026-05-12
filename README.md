@@ -1,6 +1,6 @@
 # Spring Boot ngrok Starter
 
-[![Build](https://github.com/kermel/spring-boot-ngrok-starter/actions/workflows/ci.yml/badge.svg)](https://github.com/kermel/spring-boot-ngrok-starter/actions/workflows/ci.yml)
+[![Build](https://github.com/KeremShtyn/spring-boot-ngrok-starter/actions/workflows/ci.yml/badge.svg)](https://github.com/KeremShtyn/spring-boot-ngrok-starter/actions/workflows/ci.yml)
 [![Java 17+](https://img.shields.io/badge/Java-17%2B-blue)](https://openjdk.org/)
 [![Spring Boot 3.2+](https://img.shields.io/badge/Spring%20Boot-3.2%2B-brightgreen)](https://spring.io/projects/spring-boot)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
